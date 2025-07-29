@@ -1,52 +1,152 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../api';
-import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrorMsg('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await loginUser(form);
+      const res = await loginUser(form); // Capture response
       alert('Login successful!');
-      navigate('/');
+  
+      const role = res.data.user.role;
+      console.log("Logged in user role:", role); 
+  
+      // Role-based redirection
+     
+      if (role === 'Admin') {
+        navigate('/admin-panel');
+      } else if (role === 'Customer') {
+        navigate('/customer-panel');
+      } else {
+        navigate('/');
+      }
+     
     } catch (err) {
-      alert(err.response?.data?.message || 'Login failed');
+      if (err.response?.data?.message) {
+        setErrorMsg(err.response.data.message);
+      } else {
+        setErrorMsg('Something went wrong. Please try again.');
+      }
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Redirect to backend Google OAuth route
+    window.location.href = 'http://localhost:5000/api/auth/google';
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-6">
-      <div className="w-full max-w-md space-y-8">
-        <h2 className="text-center text-3xl font-bold">Sign in to your account</h2>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <input type="hidden" name="remember" value="true" />
-          <div className="space-y-4">
-            <input name="email" type="email" autoComplete="email" required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="w-full px-4 py-2 border rounded"
-            />
-            <input name="password" type="password" autoComplete="current-password" required
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Password"
-              className="w-full px-4 py-2 border rounded"
-            />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50 to-white px-6">
+      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-2xl shadow-lg">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
+            <svg
+              className="h-6 w-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+          <p className="text-sm text-gray-500">Login to continue</p>
+        </div>
+
+        {errorMsg && (
+          <p className="text-red-600 bg-red-100 text-sm p-2 rounded text-center">
+            {errorMsg}
+          </p>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <button type="submit"
-              className="group relative flex w-full justify-center rounded bg-indigo-600 py-2 px-4 text-white hover:bg-indigo-700">
-              Sign in
-            </button>
+            <label className="block text-sm font-medium text-gray-700">
+              Email Address
+            </label>
+            <div className="mt-1 relative">
+              <input
+                name="email"
+                type="email"
+                required
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-purple-500"
+              />
+              <div className="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                📧
+              </div>
+            </div>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div className="mt-1 relative">
+              <input
+                name="password"
+                type="password"
+                required
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-purple-500"
+              />
+              <div className="absolute inset-y-0 right-3 flex items-center text-gray-400">
+                🔒
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
+          >
+            Sign In
+          </button>
         </form>
+
+        <div className="text-center text-sm text-gray-500">
+          Don’t have an account?{' '}
+          <Link to="/register" className="text-purple-600 hover:underline">
+            Sign up
+          </Link>
+        </div>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-white px-2 text-gray-500">or</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-2 border py-2 rounded hover:bg-gray-100"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+            className="w-5 h-5"
+          />
+          Continue with Google
+        </button>
       </div>
     </div>
   );

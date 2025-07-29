@@ -34,6 +34,5 @@ API.interceptors.response.use(
 
 export const loginUser = (formData) => API.post("/auth/login", formData);
 export const registerUser = (formData) => API.post("/auth/register", formData);
-
-
+export const googleuser = (formData) => API.get("/auth/google");
 export const testConnection = () => API.get("/test");

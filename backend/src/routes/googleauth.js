@@ -10,8 +10,10 @@ router.get(
     '/google/callback',
     passport.authenticate('google', { session: false, failureRedirect: '/' }),
     (req, res) => {
-      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '5d' });
-      res.json({ token, user: req.user });
+      //const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '5d' });
+      res.redirect('http://localhost:5173/'); //will change later for token via sessions
+     // res.json({ token, user: req.user });
+      
     }
   );
   module.exports = router;
