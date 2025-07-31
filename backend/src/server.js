@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const googleAuthRoutes = require('./routes/googleauth'); // optional
 const protectedRoutes = require('./routes/protectedroles');
-
+const userRoutes = require('./routes/userroute');
 require('./config/passport'); // If you're using Google OAuth
 
 const app = express();
@@ -36,7 +36,7 @@ mongoose.connect(MONGO_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', googleAuthRoutes); // optional
 app.use('/api/protected', protectedRoutes);
-
+app.use('/api/users', userRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

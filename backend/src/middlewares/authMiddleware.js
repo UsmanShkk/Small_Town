@@ -18,6 +18,7 @@ exports.protect = (req,res,next) => {
   }
 };
 
+
 exports.authorizeRoles = (...allowedRoles) => {
   return (req,res,next) => {
     if (!allowedRoles.includes(req.user.role)){
@@ -26,3 +27,4 @@ exports.authorizeRoles = (...allowedRoles) => {
     next();
   }
 }
+

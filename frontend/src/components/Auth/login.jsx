@@ -1,11 +1,41 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { loginUser } from '../../api';
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);         // Will store user info if authenticated                // Used for redirecting
+  const location = useLocation();
+  useEffect(() => {
+    // Automatically check if token exists and fetch user
+    const fetchUser = async () => {
+      // if (location.pathname === '/') return;
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/me', {
+          credentials: 'include', // Send cookies with request
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log('User data:', data.user);
+          setUser(data.user);
+
+          // Redirect based on role
+          if (data.user.role === 'Admin') {
+            navigate('/admin-panel', { replace: true });
+          } else if (data.user.role === 'Customer') {
+            navigate('/customer-panel',  { replace: true });
+          }
+        }
+      } catch (err) {
+        console.log('User not logged in');
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

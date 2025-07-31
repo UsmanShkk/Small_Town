@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { Search, MapPin, Clock, Users, Star, ChefHat, Calendar, ShoppingCart, Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Landing = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchLocation, setSearchLocation] = useState('');
-
+  const navigate  = useNavigate();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+
   };
+
+  const handlestart = async () => {
+    navigate('/login')
+  }
+  
+  
 
   const features = [
     {
@@ -109,7 +118,7 @@ const Landing = () => {
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Menu</a>
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Pricing</a>
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">About</a>
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors" onClick={handlestart}>
                 Get Started
               </button>
             </div>
