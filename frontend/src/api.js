@@ -27,7 +27,7 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('Response error:', error.response?.data || error.message);
+    console.error('Response error:', error.response?.data || error.message);x
     return Promise.reject(error);
   }
 );
@@ -35,4 +35,10 @@ API.interceptors.response.use(
 export const loginUser = (formData) => API.post("/auth/login", formData);
 export const registerUser = (formData) => API.post("/auth/register", formData);
 export const googleuser = (formData) => API.get("/auth/google");
+
+export const setRole = (data) => API.post('/auth/set-role', data);
+export const registerVendor = (formData) => API.post("/vendor/register", formData);
+export const vendorstatus = () => API.get("/vendor/status");
+export const fetchVendorProfile = () => API.get('/vendor/me');
 export const testConnection = () => API.get("/test");
+

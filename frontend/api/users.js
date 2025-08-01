@@ -2,7 +2,7 @@ const API_BASE = 'http://localhost:5000/api/users'; // Adjust for production
 
 export async function fetchUsers() {
   const res = await fetch(API_BASE, { credentials: 'include' });
-  if (!res.ok) throw new Error('Failed to fetch users');
+  if (!res.ok) throw new Error('No users found');
   return res.json();
 }
 

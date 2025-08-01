@@ -1,8 +1,7 @@
 import React, { use, useState } from 'react';
 import { Search, MapPin, Clock, Users, Star, ChefHat, Calendar, ShoppingCart, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-
+import {  fetchVendorProfile } from './../api';
 const Landing = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchLocation, setSearchLocation] = useState('');
@@ -15,7 +14,20 @@ const Landing = () => {
   const handlestart = async () => {
     navigate('/login')
   }
+ 
+  const handleselling = async () => {
+    try {
+      const res = await fetchVendorProfile();
   
+      if (res && res.isApproved === false) {
+        navigate('/vendor/status');
+      } else {
+        navigate('/register-vendor');
+      }
+    } catch (error) {
+      navigate('/register-vendor');
+    }
+  };
   
 
   const features = [
@@ -121,6 +133,7 @@ const Landing = () => {
               <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors" onClick={handlestart}>
                 Get Started
               </button>
+              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors" onClick={handleselling}>Start Selling</button>
             </div>
 
             {/* Mobile menu button */}

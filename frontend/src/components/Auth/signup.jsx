@@ -38,9 +38,10 @@ export default function Signup() {
   }
 
     // Password confirmation validation
-    if (form.confirmPassword!==form.password){
-      return
+    if (form.confirmPassword !== form.password) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
+    
 
     // Name validation
     if (!form.name.trim()) {
@@ -228,6 +229,12 @@ export default function Signup() {
           <span className="mx-3 text-gray-400">or</span>
           <div className="flex-grow h-px bg-gray-300"></div>
         </div>
+        
+        {/* Google Login Button */}
+        {/* Explanation */}
+        <p className="text-sm text-gray-500 text-center mb-2">
+          We'll ask for your role after Google login.
+        </p>
 
         {/* Google Login Button */}
         <button
@@ -242,6 +249,7 @@ export default function Signup() {
           />
           <span className="text-gray-700 font-medium">Sign up with Google</span>
         </button>
+
 
 
           {/* Login Link */}

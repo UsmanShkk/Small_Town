@@ -8,10 +8,11 @@ import {
 
 export default function Users() {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'Customer' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: ''});
   const [editId, setEditId] = useState(null);
 
   const loadUsers = async () => {
+    // console.log("hello");
     try {
       const data = await fetchUsers();
       setUsers(data);
@@ -33,7 +34,7 @@ export default function Users() {
       } else {
         await createUser(form);
       }
-      setForm({ name: '', email: '', password: '', role: 'Customer' });
+      setForm({ name: '', email: '', password: '', role: ''});
       loadUsers();
     } catch (err) {
       alert(err.message);
@@ -54,6 +55,7 @@ export default function Users() {
   const startEdit = (user) => {
     setForm({
       name: user.name,
+     
       email: user.email,
       password: '', // don't prefill password
       role: user.role,

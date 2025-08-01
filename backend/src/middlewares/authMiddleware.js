@@ -4,7 +4,7 @@ exports.protect = (req,res,next) => {
   const token = req.cookies.token;
 
   if(!token){
-    res.status(100).json({message : 'Not authorized, token missing'});
+    return res.status(100).json({message : 'Not authorized, token missing'});
   }
 
   try{
@@ -12,7 +12,7 @@ exports.protect = (req,res,next) => {
 
     req.user = decoded;
 
-    next();
+    return next();
   }catch(err){
     return res.status(401).json({message : 'Invalid or Expired Token'});
   }
@@ -20,7 +20,9 @@ exports.protect = (req,res,next) => {
 
 
 exports.authorizeRoles = (...allowedRoles) => {
+  
   return (req,res,next) => {
+    console.log("user role",req.user.role);
     if (!allowedRoles.includes(req.user.role)){
       return res.status(403).json({message:'Acess Denied'})
     }
