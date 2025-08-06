@@ -1,8 +1,7 @@
 // src/pages/VendorStatus.jsx
 import { useEffect, useState } from 'react';
-import { fetchVendorProfile } from '../api'; // Adjust the path based on your project structure
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
 
 export default function VendorStatus() {
   const [vendor, setVendor] = useState(null);
@@ -10,33 +9,30 @@ export default function VendorStatus() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchVendorProfile()
-      .then((res) => {
-        const vendor = res.data;
+    const fetchVendorProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/vendor/me', { withCredentials: true });
+        const vendor = res.data.vendor;
+
         setVendor(vendor);
-  
-        if (vendor.status === 'pending') {
-          // Stay here
-        } else if (vendor.status === 'approved') {
-          navigate('/dashboard'); // Or another page
+
+        if (vendor.status === 'approved') {
+          navigate('/vendor-panel/meals');
         } else if (vendor.status === 'rejected') {
           setError('Your registration has been rejected.');
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
         setError('Could not fetch vendor profile.');
-      });
+      }
+    };
+
+    fetchVendorProfile();
   }, [navigate]);
-  
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  if (error) return <p className="text-red-500">{error}</p>;
 
-  if (!vendor) {
-    return <p>Loading vendor information...</p>;
-  }
+  if (!vendor) return <p>Loading vendor information...</p>;
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10 bg-white shadow rounded">
@@ -46,7 +42,7 @@ export default function VendorStatus() {
       <p><strong>Status:</strong> {vendor.status}</p>
       <p><strong>Address:</strong> {vendor.address}</p>
       <p><strong>Food Type:</strong> {vendor.foodType}</p>
-      {vendor.status !== 'approved' && (
+      {vendor.status === 'pending' && (
         <p className="mt-4 text-yellow-600 font-semibold">
           Your registration is pending approval. Please wait.
         </p>

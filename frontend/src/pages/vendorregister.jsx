@@ -1,6 +1,8 @@
+
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom'; // ✅ added Link
+import { loginVendor, authVendor } from './../api'; 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { registerVendor, fetchVendorProfile } from './../api';
 
 export default function VendorRegister() {
   const [formData, setFormData] = useState({
@@ -8,129 +10,118 @@ export default function VendorRegister() {
     email: '',
     password: '',
     address: '',
-    foodType: ''
+    foodType: '',
   });
-
+  
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Check if vendor already registered on mount
   useEffect(() => {
-    async function checkExistingVendor() {
+    const checkAuth = async () => {
       try {
-        const response = await fetchVendorProfile();
-        const vendor = response.data.vendor;  // Get the actual vendor object
-       
-
-        if (vendor) {
-          setFormData({
-            name: vendor.name || '',
-            email: vendor.email || '',
-            password: '',  // don't prefill password
-            address: vendor.address || '',
-            foodType: vendor.foodType || '',
-          });
-
-          if (vendor.status === 'pending') {
-            navigate('/vendor/status', { replace: true });
-          } else if (vendor.status === 'approved') {
-            navigate('/login', { replace: true });
-  // Or wherever approved vendors should go
-          } else if (vendor.status === 'rejected') {
-            setError('Your registration has been rejected by admin.');
-          }
+        const res = await authVendor();
+        if (res.data) {
+          navigate('/vendor-panel/meals');
         }
       } catch (err) {
-        console.log('No vendor profile found or error:', err.message);
-        // Show registration form if no vendor found or error occurs
+        // Not logged in, stay on login
       }
-    }
+    };
 
-    checkExistingVendor();
-  }, [navigate]);
-
-  // Handle form input changes
+    checkAuth();
+  }, []);
+  
   const handleChange = (e) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
+ 
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     try {
-      console.log('Registering vendor with data:', formData);
-      await registerVendor(formData);
-      console.log('Registration successful, redirecting to /vendor/status');
-      navigate('/vendor/status');  // Redirect after registration
+      const res = await axios.post('http://localhost:5000/api/vendor/register', formData, {
+        withCredentials: true,
+      });
+
+      if (res.status === 201) {
+        navigate('/vendor/status');
+      }
     } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'Something went wrong');
+      console.error(err);
+      setError(err.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-8 mt-10 border rounded-lg shadow-lg bg-white">
-      <h2 className="text-2xl font-bold mb-6 text-center">Vendor Registration</h2>
-
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
+    <div className="max-w-md mx-auto mt-10 bg-white shadow p-6 rounded">
+      <h1 className="text-2xl font-bold mb-4">Vendor Registration</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          name="name"
           type="text"
-          placeholder="Full Name"
+          name="name"
+          placeholder="Name"
+          className="w-full border p-2"
           value={formData.name}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md"
           required
         />
         <input
-          name="email"
           type="email"
+          name="email"
           placeholder="Email"
+          className="w-full border p-2"
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md"
           required
         />
         <input
-          name="password"
           type="password"
+          name="password"
           placeholder="Password"
+          className="w-full border p-2"
           value={formData.password}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md"
           required
         />
         <input
-          name="address"
           type="text"
-          placeholder="Business Address"
+          name="address"
+          placeholder="Address"
+          className="w-full border p-2"
           value={formData.address}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md"
           required
         />
         <input
-          name="foodType"
           type="text"
-          placeholder="Food Type (e.g., Pizza, Biryani)"
+          name="foodType"
+          placeholder="Food Type"
+          className="w-full border p-2"
           value={formData.foodType}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded-md"
           required
         />
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
         >
-          Register as Vendor
+          Register
         </button>
       </form>
+
+      {/* ✅ This line was added below the form */}
+      <p className="mt-4 text-sm text-center">
+        Already registered?{' '}
+        <Link to="/vendor-login" className="text-blue-600 hover:underline">
+          Login here
+        </Link>
+      </p>
     </div>
   );
 }

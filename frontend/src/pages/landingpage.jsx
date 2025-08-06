@@ -1,7 +1,7 @@
 import React, { use, useState } from 'react';
 import { Search, MapPin, Clock, Users, Star, ChefHat, Calendar, ShoppingCart, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import {  fetchVendorProfile } from './../api';
+import {  fetchVendorProfile, allmeals } from './../api';
 const Landing = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchLocation, setSearchLocation] = useState('');
@@ -127,7 +127,8 @@ const Landing = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Home</a>
-              <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Menu</a>
+              <a href="/meals" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Menu</a>
+
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">Pricing</a>
               <a href="#" className="text-gray-700 hover:text-orange-500 transition-colors font-medium">About</a>
               <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors" onClick={handlestart}>

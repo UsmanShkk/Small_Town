@@ -94,9 +94,30 @@ exports.loginVendor = async (req, res) => {
 };
 
 // Get Vendor Profile
+// exports.getMeVendor = async (req, res) => {
+//   try {
+//     const vendor = await Vendor.findById(req.user.id).select('-password');
+
+//     if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
+
+//     res.json({
+//       vendor: {
+//         id: vendor._id,
+//         name: vendor.name,
+//         email: vendor.email,
+//         address: vendor.address,
+//         foodType: vendor.foodType,
+//         status: vendor.status,
+//       },
+//     });
+//   } catch (err) {
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+// Get Vendor Profile
 exports.getMeVendor = async (req, res) => {
   try {
-    const vendor = await Vendor.findById(req.user.id).select('-password');
+    const vendor = req.vendor; // use req.vendor set by protectVendor
 
     if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
 
@@ -114,6 +135,7 @@ exports.getMeVendor = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 
 

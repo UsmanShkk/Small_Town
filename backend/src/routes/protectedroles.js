@@ -7,9 +7,12 @@ router.get('/admin-panel', protect, authorizeRoles('Admin'), (req,res)=>{
     res.json({message : "Welcome to admin panel"})
 })
 
-router.get('/customer-panel', protect, authorizeRoles('Customer'), (req,res)=>{
-    res.json({message : "Welcome to customer panel"})
-})
+router.get('/me', protect, authorizeRoles('customer'), (req, res) => {
+    res.status(200).json({
+      success: true,
+      user: req.user, // optionally include role/email/etc
+    });
+  });
 
 router.get('/delivery-panel', protect, authorizeRoles('Delivery'), (req,res) => {
     res.json({ mesasge : "Welcome dilvery agent"});

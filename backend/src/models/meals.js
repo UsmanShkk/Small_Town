@@ -1,42 +1,73 @@
-// models/Meal.js
-
 const mongoose = require('mongoose');
+const vendor = require('./vendor')
 
 const mealSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true,
   },
-  description: String,
-
+  description: {
+    type: String,
+    trim: true,
+  },
+  imageUrl: {
+    type: String,
+    default: '',
+  },
   price: {
     type: Number,
     required: true,
+    min: 0,
   },
 
-  imageUrl: String, // Optional: stored on S3 maybe
+ 
+  nutrition: {
+    calories: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    protein: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    carbohydrates: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    fat: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
 
-  vendor: {
+
+  allergens: {
+    type: [String], // e.g., ["nuts", "gluten", "dairy"]
+    default: [],
+  },
+
+  tags: {
+    type: [String],
+    default: [],
+  },
+
+  
+  vendorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Vendor',
+    ref: vendor,
     required: true,
   },
 
-  tags: [String], // like ['vegan', 'gluten-free', 'low-calorie']
-
-  nutrition: {
-    calories: Number,
-    protein: Number,
-    fat: Number,
-    carbs: Number,
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
-
-  isAvailable: {
-    type: Boolean,
-    default: true,
-  }
-}, {
-  timestamps: true
 });
 
-module.exports = mongoose.model('Meal', mealSchema);
+const Meal = mongoose.model('Meal', mealSchema);
+module.exports = Meal;
