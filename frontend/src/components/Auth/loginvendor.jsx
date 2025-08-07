@@ -33,13 +33,14 @@ export default function VendorLogin() {
     e.preventDefault();
     try {
       const res = await loginVendor(formData);
+      console.log("RES :", formData)  
       if (res) {
         navigate('/vendor-panel/meals');
       } else {
         setError('Login failed');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError('Login failed');
     }
   };
 

@@ -56,7 +56,6 @@ exports.registerVendor = async (req, res) => {
 // Login Vendor (only if approved)
 exports.loginVendor = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const vendor = await Vendor.findOne({ email });
     if (!vendor) return res.status(400).json({ message: 'Invalid email or password' });

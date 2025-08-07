@@ -3,10 +3,10 @@ import axios from "axios";
 const API = axios.create({
   baseURL: "http://localhost:5000/api", 
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Content-Type': 'multipart/form-data'
-  },
+  // headers: {
+  //   'Content-Type': 'application/json',
+  //   'Content-Type': 'multipart/form-data'
+  // },
   timeout: 200000, // 10 second timeout
 });
 
