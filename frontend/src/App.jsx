@@ -17,6 +17,7 @@ import ChooseRole from './components/chooserole';
 import VendorDashboard  from './pages/vendordashboard';
 import VendorLogin from './components/Auth/loginvendor';
 import GetAllMeals from './components/mealspage';
+import MealDetails  from './components/Mealdetails';
 
 function AppWrapper() {
   const [user, setUser] = useState(null);
@@ -44,6 +45,7 @@ function AppWrapper() {
       <Route path="/vendor-panel/meals" element={<VendorDashboard />} />
       <Route path="/vendor-login" element ={<VendorLogin />} />
       <Route path="/meals" element = {<GetAllMeals />} />
+      <Route path="/meal/:mealId" element={<MealDetails />} />
     </Routes>
   );
 }

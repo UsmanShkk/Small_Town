@@ -1,6 +1,6 @@
 const Vendor = require('../models/vendor');
 const jwt = require('jsonwebtoken');
-
+const getCoordinatesFromAddress = require('../config/geocode');
 // Generate token
 const createToken = (vendor) => {
   return jwt.sign(
@@ -12,11 +12,25 @@ const createToken = (vendor) => {
 
 // Register Vendor (after submitting request)
 exports.registerVendor = async (req, res) => {
-  const { name, email, password, address, foodType } = req.body;
+  const { name, email, password, address, foodType, location: clientLocation } = req.body;
 
   try {
     const exists = await Vendor.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
+
+    let location;
+
+    if (clientLocation && clientLocation.coordinates?.length === 2) {
+      // ✅ Use location from frontend (GPS)
+      location = clientLocation;
+    } else {
+      // 🧭 Fallback: Get coordinates from address
+      location = await getCoordinatesFromAddress(address);
+
+      if (!location) {
+        return res.status(400).json({ message: 'Unable to determine location from address' });
+      }
+    }
 
     const vendor = new Vendor({
       name,
@@ -24,24 +38,23 @@ exports.registerVendor = async (req, res) => {
       password,
       address,
       foodType,
-      status: 'pending'
+      location, // ✅ Save the geolocation (from GPS or address)
+      status: 'pending',
     });
 
     await vendor.save();
     const token = createToken(vendor);
 
-// Send this token in a cookie to the frontend
     res.cookie('token', token, {
-      httpOnly: true, // secure cookie, not accessible from JS
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 24 * 60 * 60 * 1000, // cookie expires in 1 day
-    });
+      maxAge: 24 * 60 * 60 * 1000,
+    }); 
 
-    // Respond with success message and status
     res.status(201).json({
       message: 'Vendor request submitted for approval',
-      status: vendor.status  // will be 'pending'
+      status: vendor.status,
     });
 
   } catch (err) {
@@ -49,6 +62,8 @@ exports.registerVendor = async (req, res) => {
     res.status(500).json({ message: 'Error registering vendor' });
   }
 };
+
+
   // inside registerVendor after await vendor.save();
 
 

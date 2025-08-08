@@ -38,9 +38,21 @@ const getMeals = async (req, res) => {
     }
   };
 
+const getMealsById = async (req, res) => {
+    try {
+      const meal = await Meal.findById(req.params.id).populate('vendorId', 'name location address');
+      if (!meal) return res.status(404).json({ message: 'Meal not found' });
+      res.json(meal);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
+
+
 const getAllMeals = async (req, res) => {
   try{
-    const meals = await Meal.find().populate('vendorId', 'name');
+    const meals = await Meal.find().populate('vendorId', 'name location');
     res.status(200).json(meals);
   } catch (err) {
     console.log('error : ', err)
@@ -107,6 +119,7 @@ const deleteMeal = async (req, res) => {
     createMeal,
     getMeals,
     getAllMeals,
+    getMealsById,
     getMealById,
     updateMeal,
     deleteMeal

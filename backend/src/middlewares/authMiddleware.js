@@ -4,7 +4,7 @@ exports.protect = (req,res,next) => {
   const token = req.cookies.token;
 
   if(!token){
-    return res.status(100).json({message : 'Not authorized, token missing'});
+    return res.status(401).json({message : 'Not authorized, token missing'});
   }
 
   try{

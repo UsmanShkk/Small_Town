@@ -8,12 +8,29 @@ const vendorSchema = new mongoose.Schema({
   address: { type: String, required: true },
   foodType: { type: [String], default: [] },
 
+  
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point', 
+      required: true,
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true,
+    },
+  },
+
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
 
   createdAt: { type: Date, default: Date.now },
 });
 
-// Encrypt password before saving
+
+vendorSchema.index({ location: '2dsphere' });
+
+//  Encrypt password before saving
 vendorSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -21,7 +38,7 @@ vendorSchema.pre('save', async function (next) {
   next();
 });
 
-// Compare password method
+// 🔐 Compare password method
 vendorSchema.methods.comparePassword = function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
 };

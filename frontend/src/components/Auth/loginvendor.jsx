@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { replace, useNavigate } from 'react-router-dom';
 import { loginVendor, authVendor } from '../../api'; // adjust path as needed
 
 export default function VendorLogin() {
@@ -12,6 +12,7 @@ export default function VendorLogin() {
     const checkAuth = async () => {
       try {
         const res = await authVendor();
+        
         if (res.data) {
           navigate('/vendor-panel/meals');
         }

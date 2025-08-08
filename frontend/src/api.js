@@ -50,3 +50,4 @@ export const loginVendor = (formdata) => API.post("/vendor/login", formdata) ;
 export const authVendor = () => API.get('/vendor/me');
 export const authcustomer = () => API.get('/protected/customer-panel');
 export const allmeals = () => API.get('/meals');
+export const getmealbyId = (id) => API.get(`/meals/${id}`)

@@ -11,7 +11,9 @@ export default function VendorRegister() {
     password: '',
     address: '',
     foodType: '',
+    location: null, // ✅ NEW
   });
+  
   
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -29,6 +31,21 @@ export default function VendorRegister() {
     };
 
     checkAuth();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            type: 'Point',
+            coordinates: [position.coords.longitude, position.coords.latitude],
+          },
+        }));
+      },
+      (error) => {
+        console.warn('Geolocation failed or not allowed:', error.message);
+        // If location is blocked, we just skip it
+      }
+    );
   }, []);
   
   const handleChange = (e) => {

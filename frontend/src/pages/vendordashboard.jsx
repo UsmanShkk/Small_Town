@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import {
   fetchVendorMeals,
@@ -156,6 +156,15 @@ export default function VendorDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto mt-8 p-4">
+    <Link
+      to="/"
+      className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v10m4-10v10m5 10H5a2 2 0 01-2-2V9a2 2 0 012-2h3.5" />
+      </svg>
+      Home
+    </Link>
       <h2 className="text-2xl font-bold mb-4">{editId ? 'Edit Meal' : 'Create New Meal'}</h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

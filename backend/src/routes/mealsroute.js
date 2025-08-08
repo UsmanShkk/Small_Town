@@ -7,8 +7,9 @@ const {
   getMeals,
   getAllMeals,
   getMealById,
+  getMealsById,
   updateMeal,
-  deleteMeal
+  deleteMeal,
 } = require('../controllers/mealcontroller');
 
 const {
@@ -46,5 +47,6 @@ router.get('/vendor-meals/:id', protectVendor, restrictToVendor, getMealById);
 router.delete('/vendor-meals-delete/:id', protectVendor, restrictToVendor, deleteMeal);
 
 router.get('/meals', getAllMeals);
+router.get('/meals/:id', getMealsById);
 
 module.exports = router;

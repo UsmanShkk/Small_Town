@@ -10,7 +10,7 @@ export default function CustomerPanel() {
     const checkAuth = async () => {
       try {
         const res = await authcustomer();
-        if (!res.data.success || res.data.user?.role !== 'customer') {
+        if (!res.data.success || res.data.user?.role !== 'Customer') {
           navigate('/login');
         } else {
           setIsAuthChecked(true); // now show dashboard
@@ -24,9 +24,13 @@ export default function CustomerPanel() {
   }, [navigate]);
 
   if (!isAuthChecked) {
-    // Show nothing (or loading) while checking auth
-    return null; // or <LoadingSpinner />
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-lg font-medium text-gray-600">Checking authentication...</p>
+      </div>
+    );
   }
+  
 
   return (
     <div className="p-8">

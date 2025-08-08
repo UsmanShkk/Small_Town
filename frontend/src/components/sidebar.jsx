@@ -1,12 +1,13 @@
 
 import { useState } from "react";
-import { FaUsers, FaStore, FaUtensils, FaShoppingCart, FaBars } from "react-icons/fa";
+import { FaUsers, FaStore, FaUtensils, FaShoppingCart, FaBars, FaHome } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
 
   const menuItems = [
+    { label: "Home", icon: <FaHome />, path: "/" },
     { label: "Dashboard", icon: <FaBars />, path: "/admin-panel" },
     { label: "Users", icon: <FaUsers />, path: "/admin-panel/users" },
     { label: "Vendors", icon: <FaStore />, path: "/admin-panel/vendors" },
