@@ -4,30 +4,19 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const http = require('http');          // ✅ Add this
+const { Server } = require('socket.io'); // ✅ Add this
 
 // Initialize express app
 const app = express();
 
-// ✅ CORS middleware should be placed early
+// ✅ CORS middleware
 app.use(cors({
-  origin: 'http://localhost:5173',  // Frontend origin
+  origin: 'http://localhost:5173',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// ✅ Security headers
-// app.use(helmet());
-
-// // ✅ Rate limiting
-// const apiLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100,
-//   message: '⚠️ Too many requests from this IP. Try again later.',
-// });
-// app.use('/api', apiLimiter);
 
 // ✅ Common middlewares
 app.use(express.json());
@@ -56,8 +45,48 @@ app.use('/api/vendor', require('./routes/vendoroutes'));
 app.use('/api/admin', require('./routes/vendoradminroute'));
 app.use('/api', require('./controllers/vendorstatus'));
 app.use('/api', require('./routes/mealsroute'));
+app.use('/api', require('./routes/preferences'));
+app.use('/api', require('./routes/stripe'));
+app.use('/api', require('./routes/orderroutes'));
+app.use('/api', require('./routes/agentroutes'));
+app.use("/api/mealsplan", require('./routes/mealsplanroute'));
+// ✅ Create HTTP server for Socket.io
+const server = http.createServer(app);
 
-// ✅ Start the server
-app.listen(PORT, () => {
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173', // frontend URL
+    methods: ['GET', 'POST'],
+    credentials: true,               // ✅ allow cookies/JWT
+  }
+});
+
+
+// ✅ Make io accessible in controllers
+app.set('io', io);
+
+// ✅ Socket.io connections
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+
+  // Customer joins their order room
+  socket.on('joinOrderRoom', (orderId) => {
+    socket.join(`order_${orderId}`); // Add 'order_' prefix
+    console.log(`Customer joined order room: order_${orderId}`);
+  });
+
+  // Vendor joins their vendor room
+  socket.on('joinVendorRoom', (vendorId) => {
+    socket.join(`vendor_${vendorId}`);
+    console.log(`Vendor joined room: vendor_${vendorId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
+
+// ✅ Start server using HTTP server
+server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

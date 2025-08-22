@@ -17,8 +17,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Admin', 'Customer', 'Chef', 'Delivery'],
   },
+  cart: [
+    {
+      meal: { type: mongoose.Schema.Types.ObjectId, ref: 'Meal', required: true },
+      quantity: { type: Number, required: true, default: 1 }
+    }
+  ]
 });
 
+ 
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
