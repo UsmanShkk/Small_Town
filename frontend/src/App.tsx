@@ -100,6 +100,7 @@ function App() {
           </AnimatePresence>
         )}
         <Newsletter />
+        <Contact></Contact>
       </main>
       <Footer />
     </div>

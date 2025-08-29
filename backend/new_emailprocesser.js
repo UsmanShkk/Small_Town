@@ -141,71 +141,8 @@ class GmailNewsPoller {
     //         const response = await this.gmail.users.messages.get({
     //             userId: 'me',
     //             id: messageId
-    //         });
 
-    //         const message = response.data;
-    //         const headers = message.payload.headers;
-            
-    //         // Extract email metadata
-    //         const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-    //         const from = headers.find(h => h.name === 'From')?.value || 'Unknown Sender';
-    //         const date = headers.find(h => h.name === 'Date')?.value || 'Unknown Date';
-            
-    //         // Get email body
-    //         let body = '';
-    //         if (message.payload.body.data) {
-    //             body = Buffer.from(message.payload.body.data, 'base64').toString();
-    //         } else if (message.payload.parts) {
-    //             const textPart = message.payload.parts.find(part => part.mimeType === 'text/plain');
-    //             if (textPart && textPart.body.data) {
-    //                 body = Buffer.from(textPart.body.data, 'base64').toString();
-    //             }
-    //         }
 
-    //         // Process attachments and find images
-    //         let savedImagePath = null;
-    //         const attachments = [];
-            
-    //         if (message.payload.parts) {
-    //             for (const part of message.payload.parts) {
-    //                 if (part.filename && part.body.attachmentId) {
-    //                     const attachmentData = await this.getAttachment(messageId, part.body.attachmentId);
-                        
-    //                     if (attachmentData) {
-    //                         const attachmentInfo = {
-    //                             filename: part.filename,
-    //                             mimeType: part.mimeType,
-    //                             size: part.body.size,
-    //                             hasData: true
-    //                         };
-                            
-    //                         attachments.push(attachmentInfo);
-                            
-    //                         // Check if this is an image and save it
-    //                         if (this.isImageFile(part.filename, part.mimeType) && !savedImagePath) {
-    //                             savedImagePath = await this.saveImageAttachment(messageId, attachmentInfo, attachmentData);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         return {
-    //             id: messageId,
-    //             subject,
-    //             from,
-    //             date,
-    //             body: body,
-    //             fullBody: body, // Keep full body for newsChecker
-    //             bodyPreview: body.substring(0, 500) + (body.length > 500 ? '...' : ''), // Truncate for display only
-    //             attachments: attachments,
-    //             savedImagePath: savedImagePath
-    //         };
-    //     } catch (error) {
-    //         console.error(`❌ Error getting email details for ${messageId}:`, error.message);
-    //         return null;
-    //     }
-    // }
 
     async getEmailDetails(messageId) {
         try {

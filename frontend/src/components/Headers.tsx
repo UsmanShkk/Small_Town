@@ -19,7 +19,7 @@ const Header = () => {
           >
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Community Pulse
+              Small Town
             </span>
           </motion.div>
           
