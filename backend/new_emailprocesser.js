@@ -2,6 +2,11 @@ const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+const app=require('express')()
+const cors=require('cors')
+
+
+app.use(cors())
 
 // Import your newsChecker function
 const { newsChecker } = require('../backend/src/controllers/AISetup.js'); // Adjust path as needed
@@ -332,7 +337,9 @@ class GmailNewsPoller {
             console.log('🔄 Processing email with newsChecker...');
             
             // Call newsChecker with email text and image path (if available)
-            await newsChecker(emailDetails.fullBody, emailDetails.savedImagePath);
+            const response=await newsChecker(emailDetails.fullBody, emailDetails.savedImagePath);
+            // console.log(response)
+            return response
             
             console.log('✅ Email processed by newsChecker');
         } catch (error) {
@@ -349,14 +356,15 @@ class GmailNewsPoller {
         while (this.isRunning) {
             try {
                 const newMessages = await this.searchNewsEmails();
-                
+                return newMessages
                 for (const message of newMessages) {
                     const emailDetails = await this.getEmailDetails(message.id);
                     if (emailDetails) {
                         this.displayEmailInfo(emailDetails);
                         
                         // Process with newsChecker
-                        await this.processEmailWithNewsChecker(emailDetails);
+                        const response=await this.processEmailWithNewsChecker(emailDetails);
+                        console.log("Processor: ",response)
                         
                         this.processedEmails.add(message.id);
                         this.saveProcessedEmails(); // Save after each processed email
@@ -390,6 +398,10 @@ class GmailNewsPoller {
 }
 
 // Usage
+app.get('/news',(req,res)=>{
+       
+     return 
+})
 async function main() {
     const poller = new GmailNewsPoller();
     

@@ -203,15 +203,17 @@ async function newsChecker(emailText, imagePath = null) {
 You are a News Checker assistant. 
 Your job:
 1. If the image contains vulgar, violent, or extremely unsafe content → set "image": "not_accepted".
+
 2. Otherwise set "image": "accepted".
 3. Extract any place/location mentioned (e.g. "This incident happened at Karachi").
 4. Write a short clean "summary" of what happened.
 5. Determine "risk_level": low, medium, or high depending on severity.
 6. Generate a user-friendly formatted "report_text" (clear, short, readable for public display).
 
+If there is no Image then give image None in json
 Always return valid JSON with this exact schema:
 {
-  "image": "accepted/not_accepted",
+  "image": "accepted/not_accepted/json.",
   "place": "<detected place or null>",
   "summary": "<short summary>",
   "risk_level": "<low/medium/high>",
@@ -226,7 +228,7 @@ Only output valid JSON, no extra commentary.
       response_format: { type: "json_object" } // forces JSON output
     });
 
-    console.log("✅ JSON Report:", response.choices[0].message.content);
+    // console.log("✅ JSON Report:", response.choices[0].message.content);
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
     console.error("❌ Error calling OpenAI:", error.message);
