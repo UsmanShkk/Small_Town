@@ -25,11 +25,21 @@ console.log('📍 Process CWD:', process.cwd());
 const app = express();
 
 // CORS configuration for localhost:5173
-app.use(cors({
-    // origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-    origin: ['*'],
-    credentials: true
-}));
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
@@ -140,50 +150,75 @@ class GmailNewsPoller {
         }
     }
 
+    // async searchNewsEmails() {
+    //     try {
+    //         // Search broadly for gmail.com emails and filter client-side
+    //         const query = 'from:gmail.com';
+            
+    //         const response = await this.gmail.users.messages.list({
+    //             userId: 'me',
+    //             q: query,
+    //             maxResults: 100
+    //         });
+
+    //         const messages = response.data.messages || [];
+    //         const filteredMessages = [];
+            
+    //         // Get email details and filter for emails ending with "nix@gmail.com"
+    //         for (const message of messages) {
+    //             try {
+    //                 const msgDetails = await this.gmail.users.messages.get({
+    //                     userId: 'me',
+    //                     id: message.id,
+    //                     format: 'metadata'
+    //                 });
+                    
+    //                 const fromHeader = msgDetails.data.payload.headers.find(h => h.name === 'From');
+    //                 if (fromHeader) {
+    //                     // Extract email from "Name <email>" format or just "email"
+    //                     const emailMatch = fromHeader.value.match(/<([^>]+)>|([^\s<>]+@[^\s<>]+)/);
+    //                     const senderEmail = emailMatch ? (emailMatch[1] || emailMatch[2]) : '';
+                        
+    //                     // Check if email ends with "nix@gmail.com"
+    //                     if (senderEmail.endsWith('nix@gmail.com')) {
+    //                         filteredMessages.push(message);
+    //                     }
+    //                 }
+    //             } catch (err) {
+    //                 console.error(`Error getting message ${message.id}:`, err.message);
+    //             }
+    //         }
+            
+    //         // Filter out already processed emails
+    //         const newMessages = filteredMessages.filter(msg => !this.processedEmails.has(msg.id));
+            
+    //         if (newMessages.length > 0) {
+    //             console.log(`📧 Found ${newMessages.length} new emails ending with nix@gmail.com`);
+    //         }
+            
+    //         return newMessages;
+    //     } catch (error) {
+    //         console.error('❌ Error searching emails:', error.message);
+    //         return [];
+    //     }
+    // }
     async searchNewsEmails() {
         try {
-            // Search broadly for gmail.com emails and filter client-side
-            const query = 'from:gmail.com';
+            const query = 'from:usmansheikhnix@gmail.com';
             
             const response = await this.gmail.users.messages.list({
                 userId: 'me',
                 q: query,
-                maxResults: 100
+                maxResults: 10
             });
 
             const messages = response.data.messages || [];
-            const filteredMessages = [];
-            
-            // Get email details and filter for emails ending with "nix@gmail.com"
-            for (const message of messages) {
-                try {
-                    const msgDetails = await this.gmail.users.messages.get({
-                        userId: 'me',
-                        id: message.id,
-                        format: 'metadata'
-                    });
-                    
-                    const fromHeader = msgDetails.data.payload.headers.find(h => h.name === 'From');
-                    if (fromHeader) {
-                        // Extract email from "Name <email>" format or just "email"
-                        const emailMatch = fromHeader.value.match(/<([^>]+)>|([^\s<>]+@[^\s<>]+)/);
-                        const senderEmail = emailMatch ? (emailMatch[1] || emailMatch[2]) : '';
-                        
-                        // Check if email ends with "nix@gmail.com"
-                        if (senderEmail.endsWith('nix@gmail.com')) {
-                            filteredMessages.push(message);
-                        }
-                    }
-                } catch (err) {
-                    console.error(`Error getting message ${message.id}:`, err.message);
-                }
-            }
             
             // Filter out already processed emails
-            const newMessages = filteredMessages.filter(msg => !this.processedEmails.has(msg.id));
+            const newMessages = messages.filter(msg => !this.processedEmails.has(msg.id));
             
             if (newMessages.length > 0) {
-                console.log(`📧 Found ${newMessages.length} new emails ending with nix@gmail.com`);
+                console.log(`📧 Found ${newMessages.length} new emails FROM usmansheikhkniX@gmail.com`);
             }
             
             return newMessages;
@@ -356,6 +391,7 @@ try {
 })();
 
 // /news endpoint
+// /news endpoint - FIXED
 app.get('/news', async (req, res) => {
     try {
         console.log('📡 /news endpoint hit');
@@ -370,6 +406,13 @@ app.get('/news', async (req, res) => {
                 data: []
             });
         }
+
+        // ✅ FIX: Mark emails as processed IMMEDIATELY to prevent race conditions
+        for (const message of newMessages) {
+            gmailPoller.processedEmails.add(message.id);
+        }
+        gmailPoller.saveProcessedEmails();
+        console.log(`🔒 Marked ${newMessages.length} emails as processed`);
 
         const processedResults = [];
 
@@ -393,14 +436,8 @@ app.get('/news', async (req, res) => {
                 };
                 
                 processedResults.push(result);
-                
-                // Mark as processed
-                gmailPoller.processedEmails.add(message.id);
             }
         }
-        
-        // Save processed emails
-        gmailPoller.saveProcessedEmails();
         
         res.json({
             success: true,

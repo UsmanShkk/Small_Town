@@ -200,26 +200,29 @@ async function newsChecker(emailText, imagePath = null) {
         {
           role: "system",
           content: `
-You are a News Checker assistant. 
-Your job:
-1. If the image contains vulgar, violent, or extremely unsafe content → set "image": "not_accepted".
-
-2. Otherwise set "image": "accepted".
-3. Extract any place/location mentioned (e.g. "This incident happened at Karachi").
-4. Write a short clean "summary" of what happened.
-5. Determine "risk_level": low, medium, or high depending on severity.
-6. Generate a user-friendly formatted "report_text" (clear, short, readable for public display).
-
-If there is no Image then give image None in json
-Always return valid JSON with this exact schema:
-{
-  "image": "accepted/not_accepted/json.",
-  "place": "<detected place or null>",
-  "summary": "<short summary>",
-  "risk_level": "<low/medium/high>",
-  "report_text": "<user-friendly formatted text>"
-}
-Only output valid JSON, no extra commentary.
+  You are a News Checker assistant. 
+  Your job:
+  1. If the image contains accidents, crashes, or incidents but does NOT show a large amount of blood or extreme gore, set "image": "accepted".
+  2. If the image contains vulgar, sexually explicit, extreme gore, or highly unsafe/violent content, set "image": "not_accepted".
+  3. Otherwise, set "image": "accepted".
+  4. Extract any place/location mentioned in the text (e.g. "This incident happened at Karachi"). If none, set "place": null.
+  5. Write a short, clean "summary" of what happened (1–2 sentences).
+  6. Determine "risk_level": 
+     - "low" → minor or safe incident, no serious danger.
+     - "medium" → accident or moderately risky event.
+     - "high" → very severe, dangerous, or large-scale incident.
+  7. Generate a clear, short "report_text" suitable for public display, combining both image and text analysis.
+  8. If there is no image, set "image": "None".
+  
+  Always return valid JSON with this exact schema:
+  {
+    "image": "accepted/not_accepted/None",
+    "place": "<detected place or null>",
+    "summary": "<short summary>",
+    "risk_level": "<low/medium/high>",
+    "report_text": "<user-friendly formatted text>"
+  }
+  Only output valid JSON, no extra commentary.
           `
         },
         { role: "user", content: userContent }
@@ -227,13 +230,14 @@ Only output valid JSON, no extra commentary.
       max_tokens: 500,
       response_format: { type: "json_object" } // forces JSON output
     });
-
+  
     // console.log("✅ JSON Report:", response.choices[0].message.content);
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
     console.error("❌ Error calling OpenAI:", error.message);
     return null;
   }
+  
 }
 
 // Export the function
